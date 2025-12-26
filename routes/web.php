@@ -9,11 +9,6 @@ use App\Http\Controllers\LockerBookingController;
 //     return view('welcome');
 // });
 
-Route::resource('/', DashboardController::class)->only(['index']);
-
 Route::get('/login', function () {
     return view('login.login');
 });
-
-Route::resource('/history', HistoryController::class);
-Route::resource('/book', LockerBookingController::class);
