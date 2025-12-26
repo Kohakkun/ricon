@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LockerSession;
 use Illuminate\Http\Request;
 
 class HistoryController extends Controller
@@ -11,7 +12,10 @@ class HistoryController extends Controller
      */
     public function index()
     {
-        return view('history'); 
+        $bookings = LockerSession::with(['user', 'locker', 'assignedTaker', 'items'])->get();
+
+        dd($bookings);
+        return view('history', compact('bookings'));
     }
 
     /**
