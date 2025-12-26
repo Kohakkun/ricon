@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
-    use Notifiable;
+    use HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
@@ -21,24 +22,43 @@ class User extends Authenticatable
         'password',
     ];
 
-     protected static function booted()
+    public function getJWTIdentifier()
     {
-        static::created(function ($user) {
-            Taker::create([
-                'user_id' => $user->id,
-            ]);
-        });
+        return $this->getKey();
     }
 
-    // User booking locker
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
     public function lockerSessions()
     {
         return $this->hasMany(LockerSession::class);
     }
 
-        // Notifications
+    public function addedItems()
+    {
+        return $this->hasMany(LockerItem::class, 'added_by');
+    }
+
+    public function takerProfile()
+    {
+        return $this->hasOne(Taker::class);
+    }
+
     public function notifications()
     {
         return $this->hasMany(Notification::class);
+    }
+
+    public function isUser()
+    {
+        return $this->role === 'user';
+    }
+
+    public function isCourier()
+    {
+        return $this->role === 'courier';
     }
 }

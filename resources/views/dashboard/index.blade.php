@@ -11,9 +11,11 @@
         <p class="fs-5 fst-italic">book your locker now!</p>
     </div>
 
-    <button class="btn btn-primary btn-rounded px-4">
-        Book a Locker
-    </button>
+    <a href="{{ route('book.index') }}"
+   class="btn btn-primary btn-rounded px-4">
+    Book a Locker
+</a>
+
 </div>
 
 {{-- MAIN CONTENT --}}
