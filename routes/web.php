@@ -31,11 +31,14 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
 
 
 Route::middleware('auth')->group(function() {
-     Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications', [NotificationController::class, 'index']);
     Route::get('/notifications/{id}', [NotificationController::class, 'show']);
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::get('/locker-session/{session}/taken-notif', [NotificationController::class, 'itemTakenNotificationOnly']);
     Route::get('/notifications/booking', [NotificationController::class, 'indexBookingNotifications']);
+    Route::resource('/booking', LockerBookingController::class);
+    Route::put('/booking/{booking}/assign-user', [LockerBookingController::class, 'assignUser'])->name('booking.assignUser');
+    Route::get('/booking/{booking}/assign-user', [LockerBookingController::class, 'showAssignUserForm'])->name('booking.showAssignUserForm');
 });
 
 Route::get('/kiosk', function () {

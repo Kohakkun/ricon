@@ -3,123 +3,235 @@
 @section('title', 'History')
 
 @push('scripts')
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script> --}}
-    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const buttons = document.querySelectorAll('.lihat-detail-btn');
-            const modal = document.getElementById('historiModal');
+        document.addEventListener('click', function(e) {
+            if (!e.target.classList.contains('detail-btn')) return;
 
-            buttons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.getElementById('modal-date').innerText = this.dataset.date;
-                    document.getElementById('modal-address').innerText = this.dataset.address;
-                    document.getElementById('modal-driver').innerText = this.dataset.driver;
-                    document.getElementById('modal-summary').innerHTML = this.dataset.summary;
-                    modal.style.display = 'block';
-                });
-            });
+            const btn = e.target;
 
-            document.querySelector('.close-btn').addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
+            const data = {
+                title: btn.dataset.title,
+                created_at: btn.dataset.created,
+                locker: btn.dataset.locker,
+                item: {
+                    id: btn.dataset.itemId,
+                    name: btn.dataset.itemName,
+                    detail: btn.dataset.itemDetail,
+                    added_at: btn.dataset.itemAdded,
+                }
+            };
+
+            showNotificationDetail(data);
         });
+
+        function showNotificationDetail(n) {
+            const modalBody = document.getElementById('notifModalBody');
+
+            modalBody.innerHTML = `
+        <div id="receiptContainer"
+            style="padding:20px;background:#fff;border-radius:10px;
+                   box-shadow:0 5px 15px rgba(0,0,0,.2);
+                   font-family:Segoe UI;">
+            <h5>${n.title}</h5>
+            <small>${new Date(n.created_at).toLocaleString()}</small>
+            <hr>
+            <p><b>Locker:</b> ${n.locker}</p>
+            <p><b>Item:</b> ${n.item.name}</p>
+            ${n.item.detail ? `<p>Detail: ${n.item.detail}</p>` : ''}
+            <p>Added at: ${new Date(n.item.added_at).toLocaleString()}</p>
+        </div>
+
+        <button class="btn btn-sm btn-primary mt-3" id="downloadReceipt">
+            Download Receipt
+        </button>
+    `;
+
+            document.getElementById('downloadReceipt').onclick = () => {
+                html2canvas(document.getElementById('receiptContainer')).then(canvas => {
+                    const link = document.createElement('a');
+                    link.href = canvas.toDataURL('image/png');
+                    link.download = `locker-item-${n.item.id}.png`;
+                    link.click();
+                });
+            };
+
+            new bootstrap.Modal(document.getElementById('notifModal')).show();
+        }
     </script>
+@endpush
+
+@push('styles')
+    <style>
+        .table-wrapper {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            margin-top: 20px;
+        }
+
+        .table {
+            margin-bottom: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table thead th {
+            background: #f8f9fa;
+            color: #212529;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+            background: #ffffff;
+        }
+
+        .table tbody tr:hover td {
+            background: #f5f7fa;
+        }
+
+        /* Rounded corners */
+        .table thead tr th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        .table thead tr th:last-child {
+            border-top-right-radius: 12px;
+        }
+
+        .table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 12px;
+        }
+
+        .table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 12px;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+        }
+
+        .btn-outline-dark {
+            border-radius: 8px;
+        }
+
+        /* FORCE TEXT COLOR FOR HISTORY TABLE */
+        .table-wrapper,
+        .table-wrapper table,
+        .table-wrapper th,
+        .table-wrapper td {
+            color: #212529 !important;
+            /* dark text */
+        }
+
+        /* Header text */
+        .table-wrapper thead th {
+            color: #212529 !important;
+        }
+
+        /* Detail button outline fix */
+        .table-wrapper .btn-outline-dark {
+            border-color: #6c757d;
+        }
+    </style>
 @endpush
 
 @section('content')
     <div class="hero d-flex justify-content-between align-items-center">
         <div>
-            <h1 class="fw-bold">Riwayat</h1>
+            <h1 class="fw-bold text-white">Riwayat</h1>
         </div>
     </div>
 
-
-    <div class="card-body">
-
-        {{-- ===== STATIC ORDER ITEM ===== --}}
-        <div class="mb-3 p-3 rounded" style="background-color:#f9fdf9; border:1px solid #d4ecd4;">
-            <div class="row mb-2">
-                <div class="col-6">
-                    <span class="badge bg-success">Disetujui</span>
-                </div>
-                <div class="col-6 text-end">
-                    <span class="fw-semibold text-success">
-                        Rp25.000
-                    </span>
-                </div>
-            </div>
-
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <div class="text-muted">
-                        Senin, 16 Des 2024
-                    </div>
-                    <div class="text-success fw-semibold">
-                        2kg Plastik, 1kg Kertas
-                    </div>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <button class="btn btn-outline-success lihat-detail-btn w-100" data-date="Senin, 16 Des 2024"
-                        data-address="Jl. Merdeka No.10, Jakarta, DKI Jakarta, 12345" data-driver="Budi Santoso"
-                        data-summary="
-                                        <table class='table table-bordered text-sm'>
-                                            <thead>
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>Jenis Sampah</th>
-                                                    <th>Berat</th>
-                                                    <th>Harga/Kg</th>
-                                                    <th>Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>Plastik</td>
-                                                    <td>2 kg</td>
-                                                    <td>Rp5.000</td>
-                                                    <td>Rp10.000</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2</td>
-                                                    <td>Kertas</td>
-                                                    <td>1 kg</td>
-                                                    <td>Rp15.000</td>
-                                                    <td>Rp15.000</td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan='4'><b>Total</b></td>
-                                                    <td><b>Rp25.000</b></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        ">
-                        Lihat Detail
-                    </button>
-                </div>
-            </div>
+    @if ($bookings->isEmpty())
+        <div class="alert alert-warning">
+            Tidak ada riwayat pemesanan loker
         </div>
-        {{-- ===== END STATIC ORDER ===== --}}
+    @else
+        <div class="table-wrapper">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Booked At</th>
+                        <th>Locker</th>
+                        <th>Status</th>
+                        <th>Nama Barang</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($bookings as $booking)
+                        @php
+                            $items = $booking->items;
+                            $rowspan = max($items->count(), 1);
+                        @endphp
+
+                        @forelse ($items as $index => $item)
+                            <tr>
+                                @if ($index === 0)
+                                    <td rowspan="{{ $rowspan }}">{{ $loop->parent->iteration }}</td>
+                                    <td rowspan="{{ $rowspan }}">
+                                        {{ $booking->created_at->format('d M Y H:i') }}
+                                    </td>
+                                    <td rowspan="{{ $rowspan }}">
+                                        Locker {{ $booking->locker_id }}
+                                    </td>
+                                    <td rowspan="{{ $rowspan }}">
+                                        <span class="badge bg-{{ $booking->status === 'done' ? 'success' : 'danger' }}">
+                                            {{ ucfirst($booking->status) }}
+                                        </span>
+                                    </td>
+                                @endif
+
+                                <td>{{ $item->item_name }}</td>
+
+                                <td>
+                                    <button class="btn btn-sm btn-outline-dark detail-btn" data-title="Locker Receipt"
+                                        data-created="{{ $booking->created_at }}"
+                                        data-locker="Locker {{ $booking->locker_id }}" data-item-id="{{ $item->id }}"
+                                        data-item-name="{{ $item->item_name }}" data-item-detail="{{ $item->detail }}"
+                                        data-item-added="{{ $item->created_at }}">
+                                        Detail
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $booking->created_at->format('d M Y H:i') }}</td>
+                                <td>Locker {{ $booking->locker_id }}</td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        {{ ucfirst($booking->status) }}
+                                    </span>
+                                </td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        @endforelse
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
         {{-- MODAL --}}
-        <div id="historiModal" class="modal-overlay" style="display:none;">
-            <div class="modal-content">
-                <div class="d-flex justify-content-between mb-2">
-                    <div>
-                        <strong>Tanggal:</strong> <span id="modal-date"></span><br>
-                        <strong>Alamat:</strong> <span id="modal-address"></span><br>
-                        <strong>Driver:</strong> <span id="modal-driver"></span>
+        <div class="modal fade" id="notifModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Item Detail</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <button class="close-btn btn btn-sm btn-light">&times;</button>
+                    <div class="modal-body" id="notifModalBody"></div>
                 </div>
-                <h6>Ringkasan Penukaran</h6>
-                <div id="modal-summary"></div>
             </div>
         </div>
-        {{-- END MODAL --}}
-    </div>
-    @endsection
+    @endif
+@endsection
