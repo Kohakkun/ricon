@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function() {
     Route::get('/notifications/{id}', [NotificationController::class, 'show']);
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::get('/locker-session/{session}/taken-notif', [NotificationController::class, 'itemTakenNotificationOnly']);
+    Route::get('/locker-item/{item}/delivered', [NotificationController::class, 'itemDeliveredNotification']);
     Route::get('/notifications/booking', [NotificationController::class, 'indexBookingNotifications']);
     Route::resource('/booking', LockerBookingController::class);
     Route::put('/booking/{booking}/assign-user', [LockerBookingController::class, 'assignUser'])->name('booking.assignUser');
