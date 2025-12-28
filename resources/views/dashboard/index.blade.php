@@ -45,9 +45,10 @@
                                     </a>
                                 </div>
                                 <div class="col-md-6">
-                                    <button class="btn btn-dark w-100 btn-rounded">
-                                        show QR Code
-                                    </button>
+                                    <a href="{{ route('booking.show', $booking->id) }}"
+                                        class="btn btn-dark w-100 btn-rounded">
+                                        Manage Locker
+                                    </a>
                                 </div>
                                 <div class="col-md-6">
                                     <a href="{{ route('booking.showAssignUserForm', $booking) }}" class="btn btn-dark w-100 btn-rounded">
