@@ -13,7 +13,7 @@ class LockerItem extends Model
         'item_detail',
         'key',
         'opened_by_sender',
-        'qr_path', // Add this here
+        'qr_path',
         'added_at',
     ];
 
@@ -23,7 +23,10 @@ class LockerItem extends Model
 
     public function session()
     {
-        return $this->belongsTo(LockerSession::class, 'locker_id');
+        // return $this->belongsTo(LockerSession::class, 'locker_id');
+
+        //gres test
+        return $this->belongsTo(LockerSession::class, 'locker_session_id');
     }
 
     public function notifications()
