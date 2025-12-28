@@ -9,7 +9,7 @@
         body {
             margin: 0;
             padding: 0;
-            height: 100%;
+            height: 100%;a
             overflow: hidden;
             background: linear-gradient(90deg, #5bb6c6, #6bb7e8) !important;
         }
